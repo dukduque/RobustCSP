@@ -186,7 +186,7 @@ public class RobGen {
 		try {
 			rr = new Random(312);
 			int cuantas = 0;
-			for (int o = 30; o <=30; o++) {
+			for (int o = 20; o <=20; o++) {
 				for (int i =1; i <= 9; i++) {
 					for (int var = 0; var <= 2*0; var++) {
 						String str_varr = null;

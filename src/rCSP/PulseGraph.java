@@ -51,8 +51,14 @@ public class PulseGraph  implements Graph<VertexPulse, EdgePulse> {
 		vertexes = new VertexPulse[numNodes];
 		path= new ArrayList<Integer>();
 		pathWeights= new int[DataHandler.arc_weights];
-		y_primal_bound = 0;
+		y_primal_bound = -1;
 		
+	}
+	
+	public void resetPrimalSolution(){
+		path= new ArrayList<Integer>();
+		pathWeights= new int[DataHandler.arc_weights];
+		y_primal_bound = -1;
 	}
 	@Override
 	public EdgePulse addEdge(VertexPulse sourceVertex, VertexPulse targetVertex) {
@@ -219,7 +225,7 @@ public class PulseGraph  implements Graph<VertexPulse, EdgePulse> {
 		return Ct;
 	}
 	
-	public void resetNetwork(){
+	public void resetNetwork1(){
 		for (int i = 0; i < numNodes ; i++) {
 			vertexes[i].reset();
 		}
@@ -235,65 +241,5 @@ public class PulseGraph  implements Graph<VertexPulse, EdgePulse> {
 		return C[obj];
 	}
 	
-//	public void printEF() {
-//		for (int i = 0; i < path.size(); i++) {
-//			System.out.print("Path: " + path.get(i));
-//			for (int j = 0; j < DataHandler.arc_weights; j++) {
-//				System.out.print("  FO_"+j+": " + pathWeights[j].get(i));
-//			}System.out.println();
-//		}
-//		
-//	}
-//	
-	
-	
-	
-	
-//	public void Sort(ArrayList<Integer>[] set) {
-//		QS(set, 0, set[0].size() - 1);
-//	}
-
-	public int colocar(ArrayList<Integer>[] e, int b, int t) {
-		int i;
-		int pivote, valor_pivote;
-		int temp;
-		ArrayList<Integer> tempPaths;
-		pivote = b;
-		valor_pivote = e[0].get(pivote);
-		for (i = b + 1; i <= t; i++) {
-			if (e[0].get(i)< valor_pivote) {
-				pivote++;
-				for (int j = 0; j < e.length; j++) {
-					temp = e[j].get(i);
-					e[j].set(i, e[j].get(pivote));
-					e[j].set(pivote, temp);
-				}
-				tempPaths = path.get(i);
-				path.set(i, path.get(pivote));
-				path.set(pivote, tempPaths);
-				
-			}
-		}
-
-		for (int j = 0; j < e.length; j++) {
-			temp = e[j].get(b);
-			e[j].set(b, e[j].get(pivote));
-			e[j].set(pivote, temp);
-		}
-		tempPaths = path.get(b);
-		path.set(b, path.get(pivote));
-		path.set(pivote, tempPaths);
-		return pivote;
-	}
-
-	public void QS(ArrayList<Integer>[] e, int b, int t) {
-		int pivote;
-		if (b < t) {
-			pivote = colocar(e, b, t);
-			QS(e, b, pivote - 1);
-			QS(e, pivote + 1, t);
-		}
-
-	}
 
 }

@@ -1,0 +1,134 @@
+model csp
+uses "mmxprs"; !gain access to the Xpress-Optimizer solver
+
+parameters
+inputFile = "datosR-CSP.dat"
+end-parameters
+
+declarations
+
+N: set of integer !set of nodes
+K: set of integer !set of scenarios
+
+c: dynamic array(N,N) of real !Conexion cost
+cK: dynamic array(N,N,K) of integer !Cost per scenario
+t: dynamic array(N,N) of real !time constrain
+kh: array(K)of integer
+
+s: integer
+e: integer
+maxt: real
+
+x: dynamic array(N,N) of mpvar
+y: array(K) of mpvar
+
+timeConstrain: linctr
+end-declarations
+
+initializations from inputFile
+kh
+s
+e
+maxt
+[c,t] as "por_Nodo"
+end-initializations
+
+W:=85
+B:=73
+maxt:=500
+forward procedure print_sol
+	
+forall(i in N) do
+	forall(j in N| exists(c(i,j))) do
+		create(x(i,j))
+		t(i,j):=t(i,j)*10
+		x(i,j) is_binary
+		forall(k in K) do
+			cK(i,j,k):=round(c(i,j)+((-1)^k)*(1/k)*c(i,j)/10.0)
+			y(k) is_binary
+		end-do
+	end-do
+end-do
+
+!Restricción de salida
+sum(j in N)x(s,j)=1
+
+!Restricción de Llegada
+sum(i in N)x(i,e)=1
+
+!Restricción de la estrucctura del la ruta
+forall(i in N| i<>s and i <> e)
+sum(j in N|exists(x(i,j)))x(i,j) - sum(j in N|exists(x(j,i)))x(j,i) = 0
+
+!Restricción de tiempo
+timeConstrain:= sum(i in N, j in N| exists(x(i,j)))t(i,j)*x(i,j)<= maxt
+
+forall(k in K) do
+	sum(i in N, j in N| exists(x(i,j)))cK(i,j,k)*x(i,j)<=B*y(k)+W*(1-y(k))
+end-do
+
+fo_cost:= sum(i in N, j in N| exists(x(i,j)))c(i,j)*x(i,j)
+fo:= sum(k in K)y(k)
+
+
+!exportprob(EP_MIN, "Formulacion punto 1.lp", fo)
+ exportprob(EP_MAX, "R-CSP.lp", fo)
+maximize(fo)
+!minimize(sum(i in N, j in N| exists(x(i,j)))t(i,j)*x(i,j))
+
+
+
+
+
+print_sol
+
+
+
+
+
+
+procedure print_sol
+	writeln("Solución de Viaje - Problema Entero")
+	beg:= s
+	str:= (""+s+"->")
+	while(beg<>e) do
+		
+		forall( i in N| exists(x(beg,i)) and getsol(x(beg,i))>0) do
+			writeln("x(", beg," , ", i,")= ", getsol(x(beg,i)))
+			beg:= i
+			str += (""+i + "->")
+		end-do
+		
+	end-do
+
+
+forall(k in K) do
+	writeln(k, " ", getsol(y(k)), " path cost:" , sum(i in N, j in N| exists(x(i,j)))cK(i,j,k)*getsol(x(i,j))) 
+end-do
+writeln("\nCosto de la ruta: ", getact(fo_cost))
+writeln("Tiempo de la ruta: ", getact(timeConstrain) )
+writeln("\n" , str)
+writeln("\nY_bar: ", getobjval)
+
+
+writeln("Network!!")
+writeln("sp min 16 31")
+writeln("1 1")
+writeln("15 -1")
+forall(i,j in N|exists(c(i,j))) do
+	write(i," ", j)
+	forall(k in K)do
+		write(" ", cK(i,j,k))
+	end-do
+	write(" ", t(i,j),"\n")
+end-do
+end-procedure
+
+
+
+
+
+!...
+
+
+end-model

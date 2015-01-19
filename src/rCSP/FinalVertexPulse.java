@@ -61,32 +61,19 @@ public class FinalVertexPulse extends VertexPulse{
 	}
 	
 	
-	public void pulse(int[] pObjs, ArrayList<Integer> path) {
-//		
-//		System.out.println("Llego pulso");
+	public void pulse(int y_bound, int[] pObjs, ArrayList<Integer> path) {
+
 		path.add(id);
-		int y_path = 0;
-		for (int i = 0; i < DataHandler.scenarios; i++) {
-			if (pObjs[i] <= DataHandler.b) {
-				y_path++;
-			}
-		}
-		if(!CheckDominance(pObjs) && y_path>=PulseGraph.y_primal_bound){
-			PulseGraph.y_primal_bound = y_path;
+		
+		if(!CheckDominance(pObjs) && y_bound>PulseGraph.y_primal_bound){
+			PulseGraph.y_primal_bound = y_bound;
 			PulseGraph.path = new ArrayList<Integer>();
 			PulseGraph.path.addAll(path);
+//			System.out.println("FO: " + y_bound + " -> " + path);
 			for (int i = 0; i < pObjs.length; i++) {
 				PulseGraph.pathWeights[i]=pObjs[i];
 			}
-			
-			//double data  = pg.calcDominatedArea();
-			//System.out.println("porcentaje " + data );
-			
-//			System.out.println("Llego pulso con " +y_path+ "\t scenarios" + path );
-//			for (int i = 0; i < pObjs.length; i++) {
-//				System.out.print(pObjs[i]+" ");
-//			}System.out.println();
-			//System.out.println("llegooo otrooooooooo y contando: p   " + PulseGraph.Paths.size());
+
 		}
 		path.remove((path.size()-1));
 	}
