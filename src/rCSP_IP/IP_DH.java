@@ -1,13 +1,14 @@
-package rCSP;
+package rCSP_IP;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-public class DataHandler {
+public class IP_DH {
 	
 	/**
 	 * Constant that stays the number of objectives
@@ -40,7 +41,12 @@ public class DataHandler {
 	static int[][] weights;
 	
 
-	private PulseGraph Gd;
+//	public ArrayList<int[]> fwd_star;
+//	public int[] fwd_pointers;
+//	
+	public ArrayList<Integer>[] fwd_arcs;
+	public ArrayList<Integer>[] bwd_arcs;
+	
 	
 	/**
 	 * Maximum resource consumption
@@ -58,7 +64,7 @@ public class DataHandler {
 	
 	
 	
-	public DataHandler(Settings Instance, int n_scenarios, int numCtrs ) {
+	public IP_DH(Settings Instance, int n_scenarios, int numCtrs ) {
 		scenarios = n_scenarios;
 		constraints = numCtrs;
 		arc_weights = scenarios + constraints;
@@ -74,18 +80,17 @@ public class DataHandler {
 		Arcs = new int[Instance.NumArcs][2];
 		weights = new int[Instance.NumArcs][arc_weights];
 		weight_bound_availability = new int[arc_weights];
-		Gd = new PulseGraph(NumNodes);
+		
 	}
 
 	public void ReadC() throws NumberFormatException, IOException {
-		Random weithgen = new Random(seed);
 		
+		//Random weithgen = new Random(seed);
 		File file = new File(CvsInput);
-
 		BufferedReader bufRdr = new BufferedReader(new FileReader(file));
 		String line = null;
 
-		String[] readed = new String[40];
+		String[] readed = new String[arc_weights + 2];
 
 		int row = 0;
 		int col = 0;
@@ -103,84 +108,56 @@ public class DataHandler {
 			if (row >= fileStep) {
 				Arcs[row - fileStep][0] = (Integer.parseInt(readed[0]) - 1);
 				Arcs[row - fileStep][1] = (Integer.parseInt(readed[1]) - 1); 
-					
 				int[] atris = new int[arc_weights];
 				for (int i = 0; i < arc_weights; i++) {
 					atris[i] = Integer.parseInt(readed[2 + i]);
 					weights[row - fileStep][i] = atris[i];
 				}
-				Gd.addWeightedEdge( Gd.getVertexByID(Arcs[row - fileStep][0]), Gd.getVertexByID(Arcs[row - fileStep][1]),atris , row-fileStep);
+				addArc(Arcs[row - fileStep][0],Arcs[row - fileStep][1]  , row - fileStep);
 			}
 
 			col = 0;
 			row++;
 
 		}
-
+	
 	
 	}
+	
+
+	private void addArc(int v_i, int v_j, int arc_index) {
+//		int point = fwd_pointers[v_i];
+//		fwd_star.add(point, atris);
+//		for (int i = v_i+1; i < fwd_pointers.length; i++) {
+//			fwd_pointers[i]++;
+//		}
+		fwd_arcs[v_i].add(arc_index);
+		bwd_arcs[v_j].add(arc_index);
+	}
+
 	public void upLoadNodes(){
-		for (int i = 0; i < NumNodes; i++) {
-			if(i!=(LastNode-1)){
-				Gd.addVertex(new VertexPulse(i) );
-			}
+//		fwd_pointers = new int[NumNodes+1];
+//		fwd_star = new ArrayList<int[]>();
+		fwd_arcs = new ArrayList[NumNodes];
+		bwd_arcs = new ArrayList[NumNodes];
+		for (int i = 0; i <NumNodes; i++) {
+			bwd_arcs[i] = new ArrayList<Integer>();
+			fwd_arcs[i] = new ArrayList<Integer>();
 		}
-		FinalVertexPulse vv = new FinalVertexPulse(LastNode-1, Gd);
-		Gd.addFinalVertex(vv);
+		Source = Source - 1;
+		LastNode = LastNode - 1;
 	}
 	
-	public PulseGraph getGd()
-	{
-		return Gd;
-	}
-	
-	public void calcMin() {
-		min_sp_of_scenarios=Integer.MAX_VALUE;
-		int[][] source_sp = PulseGraph.vertexes[Source-1].spMatrix;
-		for (int i = 0; i < scenarios; i++) {
-			if(source_sp[i][i]<min_sp_of_scenarios){
-				min_sp_of_scenarios = source_sp[i][i];
-			}
-		}
-//		System.out.println(min_sp_of_scenarios);
-	}
 
-	public void calMax() {
-		max_sp_of_scenarios = 0;
-		int[][] source_sp = PulseGraph.vertexes[Source-1].spMatrix;
-		for (int i = 0; i < scenarios; i++) {
-			for (int j = 0; j < scenarios; j++) {
-				if (source_sp[i][j] > max_sp_of_scenarios) {
-					max_sp_of_scenarios = source_sp[i][j];
-				}
-			}
-		}
-//		System.out.println(max_sp_of_scenarios);
-	}
-	
 	public void set_w(double alpha) {
-		w = (int) (min_sp_of_scenarios + alpha*(max_sp_of_scenarios-min_sp_of_scenarios));
-		System.out.print("/w/" + w);
+		
 	}
 	
 	public void set_b(double beta){
-		b = (int) (min_sp_of_scenarios + beta*(w-min_sp_of_scenarios));
-		System.out.print("/b/" + b);
+		
 	}
 			
 	public void setTmax(double gamma) {
-		int min_tmax = Integer.MAX_VALUE;
-		int max_tmax = 0;
-		int[][] source_sp = PulseGraph.vertexes[Source-1].spMatrix;
-		for (int i = 0; i < source_sp.length; i++) {
-			if (source_sp[i][scenarios] < min_tmax) {
-				min_tmax = source_sp[i][scenarios];
-			}
-			if (source_sp[i][scenarios] > max_tmax) {
-				max_tmax = source_sp[i][scenarios];
-			}
-		}
-		T = (int) (min_tmax + gamma * (max_tmax - min_tmax));
-		System.out.print("/T_max/" + T);
+		
 	}
 }

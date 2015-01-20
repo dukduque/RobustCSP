@@ -21,10 +21,10 @@ public class Main_RobustCSP {
 			
 			int num_weights =0;
 			String ini;
-			for (int ins = 1; ins <=9; ins++) {
+			for (int ins = 1; ins <=1; ins++) {
 				
-				ini = "ini/Rob_20_NJ"+ins+".ini";
-//				ini = "ini/toy"+ins+".ini";
+//				ini = "ini/Rob_20_NJ"+ins+".ini";
+				ini = "ini/toy"+ins+".ini";
 				Settings instance = new Settings(ini);
 				num_weights = instance.numScenarios + instance.numCtrs;
 				int numSPPs = num_weights;
@@ -88,7 +88,7 @@ public class Main_RobustCSP {
 				
 				
 				
-				for (double alpha = 0.25; alpha <=0.75; alpha+=0.25) {
+				for (double alpha = 0.25; alpha <=7.75; alpha+=0.25) {
 					for (double beta = 0.25; beta <= 0.75; beta+=0.25) {
 						for (double gamma = 0.25; gamma <= 0.75; gamma+=0.25) {
 							System.out.print(ini +"/SP:/"+  spTime);
@@ -97,9 +97,10 @@ public class Main_RobustCSP {
 							data.set_w(Math.round(alpha*100)/100.0);
 							data.set_b(Math.round(beta*100)/100.0);
 							data.setTmax(Math.round(gamma*100)/100.0);
-//							DataHandler.b = 73;
-//							DataHandler.w = 85;
-//							DataHandler.T = 500;
+							
+							DataHandler.b = 73;
+							DataHandler.w = 85;
+							DataHandler.T = 500;
 //							System.out.print("/w/"+alpha+"/b/"+beta+"/T_max/"+gamma);
 							ArrayList<Integer> Path = new ArrayList<Integer>();
 
