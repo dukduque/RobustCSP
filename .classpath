@@ -8,7 +8,8 @@
 	<classpathentry kind="lib" path="lib/jgrapht-0.8.2/svnClientAdapter.jar"/>
 	<classpathentry kind="lib" path="lib/jgrapht-0.8.2/TGGraphLayout.jar"/>
 	<classpathentry kind="lib" path="lib/jgrapht-0.8.2/xmlunit1.0.jar"/>
+	<classpathentry kind="lib" path="lib/ssj.jar"/>
+	<classpathentry kind="lib" path="/Library/gurobi801/mac64/lib/gurobi.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/gurobi563/win64/lib/gurobi.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
