@@ -225,19 +225,19 @@ public class RobGen {
 		try {
 			int[] numScenarios = {1,10, 50, 100, 200, 500, 1000};//, 10000}; 
 			rr = new Random(0);
-			int [] RCSPGEN = {21,23};//{5 ,7 , 13 ,15, 21, 23};
+			int [] RCSPGEN = {1};//{5 ,7 , 13 ,15, 21, 23};
 			for (int r = 0; r < RCSPGEN.length; r++) {
 				for (int i = 0; i <numScenarios.length; i++) {
 //						gen = "rcsp" + RCSPGEN[r];
-						gen = "RI1";
+						//gen = "RI1";
 						String str_varr ="gamma";
 //						String ini = p.getParent().getParent().getParent().getParent() + "/workspace/Proyectos BSP/ini/RCSP/"+gen+"_3_1"+".ini";
 						//String ini = p.getParent().getParent().getParent().getParent() + "/workspace/ProyectosBSP/ini/"+gen+".ini";
-						String ini = p.getParent().getParent()+ "/ProyectosBSP/ini/"+gen+".ini";
+						String ini = p.getParent().getParent()+ "/ProyectosBSP/ini/"+gen+1+".ini";
 						
 						System.out.println(ini);
 						//gen = "rcsp" + RCSPGEN[r] + str_varr;
-						gen = "RI";
+						//gen = "RI";
 						RobGen nm = new RobGen(numScenarios[i]+1, ini, str_varr, (gen+str_varr), numIns);
 						System.out.println("salen "  + numIns  + "  " + gen + " con " + numScenarios[i] +"escenarios");
 			}
