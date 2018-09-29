@@ -93,11 +93,12 @@ public class Main_bwRobustSP {
 						int[] weights = new int[instance.numScenarios + instance.numCtrs];
 						network.getVertexByID(instance.source - 1).pulse(0, weights, Path, path_arcs);
 						medicion = (System.nanoTime() - medicion) /1000000000.0;
-					
+						String pulse_time = String.format("%6f" , medicion);
+						String total_time = String.format("%6f" , (spTime+medicion));
 						exp_out_info += "/"
 								+ network.getVertexByID(instance.source - 1).calcDualBound(weights,
 										instance.source - 1)
-								+ "/" + medicion + "/" + (spTime + medicion) + "/" + PulseGraph.y_primal_bound
+								+ "/" + pulse_time + "/" + total_time + "/" + PulseGraph.y_primal_bound
 								+ "/" + (PulseGraph.y_primal_bound == exp.of)+line_sep;
 						System.out.print(exp_out_info);
 						
