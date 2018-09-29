@@ -1,9 +1,11 @@
 package bwRobSP;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,11 +16,17 @@ import java.util.StringTokenizer;
 
 public class Main_bwRobustSP {
 	static Path p = Paths.get(System.getProperty("user.dir"));
-	
+	static String results_path = p.toString() + "/results/RN_results.txt";
+	static String line_sep = System.getProperty("line.separator");
 
 	public static void main(String[] args) throws InterruptedException {
 		try {
 			System.out.println(p.toString());
+			File f = new File(results_path);
+			if(f.exists()){
+				f.delete();
+			}
+			f.createNewFile();
 			ArrayList<SetupInfo> experiments = read_setup();
 			
 			for (SetupInfo exp : experiments) {
@@ -71,30 +79,34 @@ public class Main_bwRobustSP {
 				double spTime = (System.currentTimeMillis() - Atime) / 1000.0;
 				for (double num_labels = 0.5; num_labels <= 4; num_labels += 0.5) {
 					for (int reps = 0; reps < 10; reps++) {
+						String  exp_out_info = exp.net_num + "/" + instance.numScenarios + "/" + spTime;
 						System.out.print(exp.net_num + "/" + instance.numScenarios + "/" + spTime);
 						DataHandler.numLabels = (int) (num_labels * DataHandler.scenarios);
 						DataHandler.w = exp.w;
 						DataHandler.b = exp.b;
-						System.out.print(DataHandler.numLabels + "/" + exp.w  + "/" + exp.b + "/" + reps );
+						System.out.print("/" + num_labels + "/" + reps  + "/" + exp.w + "/" + exp.b );
+						exp_out_info += "/" + num_labels + "/" + reps  + "/" + exp.w + "/" + exp.b;
 						// W:94214 0.5 65642
 						ArrayList<Integer> Path = new ArrayList<Integer>();
 						ArrayList<Integer> path_arcs = new ArrayList<Integer>();
-						double medicion = System.currentTimeMillis();
+						double medicion = System.nanoTime();//currentTimeMillis();
 						int[] weights = new int[instance.numScenarios + instance.numCtrs];
 						network.getVertexByID(instance.source - 1).pulse(0, weights, Path, path_arcs);
-						medicion = (System.currentTimeMillis() - medicion) / 1000.0;
-						System.out.print("/" + network.getVertexByID(instance.source - 1).calcDualBound(weights,
-								instance.source - 1));
-						System.out.print("/" + medicion);
-						System.out.print("/" + (spTime + medicion));
-						System.out.print("/" + PulseGraph.y_primal_bound);// +"/|P|/"+
-																			// PulseGraph.path.size());
-						System.out.print("/" + (PulseGraph.y_primal_bound == exp.of));
-						network.a_Posteriori_evaluation();
+						medicion = (System.nanoTime() - medicion) /1000000000.0;
+					
+						exp_out_info += "/"
+								+ network.getVertexByID(instance.source - 1).calcDualBound(weights,
+										instance.source - 1)
+								+ "/" + medicion + "/" + (spTime + medicion) + "/" + PulseGraph.y_primal_bound
+								+ "/" + (PulseGraph.y_primal_bound == exp.of)+line_sep;
+						System.out.print(exp_out_info);
+						
+						// network.a_Posteriori_evaluation();
 						// System.out.println(network.path);
-						System.out.println();
+						
 						network.resetPrimalSolution();
 						network.resetNetwork1();
+						appendStrToFile(results_path, exp_out_info);
 					}
 				}
 				network.vertexes = null;
@@ -162,5 +174,16 @@ public class Main_bwRobustSP {
 
 	}
 	
-}
+	
+	public static void appendStrToFile(String fileName, String str) {
+		try {
 
+			// Open given file in append mode.
+			BufferedWriter out = new BufferedWriter(new FileWriter(fileName, true));
+			out.write(str);
+			out.close();
+		} catch (IOException e) {
+			System.out.println("exception occoured" + e);
+		}
+	}
+}
