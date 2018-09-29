@@ -1,4 +1,4 @@
-package RobCSP;
+package bwRobSP;
 
 import java.util.ArrayList;
 
@@ -20,8 +20,12 @@ public class VertexPulse {
 	 * sp from the end node to this node of the objective i. M_ij correspond to
 	 * the objective consumptions of the objective j when the objective i is
 	 * minimum;
+	 * Change 2018/09/27:
+	 * Recovering previous version of the algorithm were only shortest paths for 
+	 * individual objectives is computed.
 	 */
-	public int[][] spMatrix;
+	//public int[][] spMatrix;
+	public int[] spVector;
 
 	public boolean[] inserted;
 	/**
@@ -37,12 +41,14 @@ public class VertexPulse {
 	
 	public VertexPulse(int iD) {
 		id = iD;
-		spMatrix = new int[DataHandler.arc_weights][DataHandler.arc_weights];
+		//spMatrix = new int[DataHandler.arc_weights][DataHandler.arc_weights];
+		spVector = new int[DataHandler.arc_weights];
 		left  = new  VertexPulse[DataHandler.arc_weights];
 		rigth = new  VertexPulse[DataHandler.arc_weights];
 		inserted = new boolean[DataHandler.arc_weights];
 		for (int i = 0; i < DataHandler.arc_weights; i++) {
-			spMatrix[i][i] = infinity;
+			//spMatrix[i][i] = infinity;
+			spVector[i] = infinity;
 			inserted[i] = false;
 			left[i] = this;
 			rigth[i] = this;
@@ -114,38 +120,22 @@ public class VertexPulse {
 					newWeights[j] = pulseWeights[j] + DataHandler.weights[magicIndex.get(i)][j];
 				}
 				// &&
-				if (!checkInfeasibility(newWeights, head_node)) {
-					int new_dual_bound = calcDualBound(newWeights, head_node);
-					int new_primal_bound = calcPrimalBound(newWeights, head_node);
-					if(!check_b_rob(new_dual_bound) && !check_w_rob(newWeights, head_node)) {
-						if (!CheckLabels(newWeights, head_node)) {
-							PulseGraph.vertexes[head_node].pulse(new_primal_bound, newWeights, path,path_arcs);
-						}
+				//if (!checkInfeasibility(newWeights, head_node)) {
+				int new_dual_bound = calcDualBound(newWeights, head_node);
+				int new_primal_bound = calcPrimalBound(newWeights, head_node);
+				if(!check_b_rob(new_dual_bound) && !check_w_rob(newWeights, head_node)) {
+					if (!CheckLabels(newWeights, head_node)) {
+						PulseGraph.vertexes[head_node].pulse(new_primal_bound, newWeights, path,path_arcs);
 					}
-
 				}
+
+				//}
 				path_arcs.remove(path_arcs.size()-1);
 			}
 			path.remove((path.size() - 1));
 		}
 	}
 
-
-
-	/**
-	 * Checks for infeasibility of the resource constraint
-	 * @param pWeights all the weights traveling in the pulse recursion.
-	 * @param node Id of the node where the pruning strategy is been asked
-	 * @return true if the pulse must be pruned, false otherwise.
-	 */
-	private boolean checkInfeasibility(int[] pWeights, int node) {
-		for (int i = DataHandler.scenarios; i < pWeights.length; i++) {
-			if(pWeights[i] + PulseGraph.vertexes[node].spMatrix[i][i] > DataHandler.T ){
-				return true;
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * Checks for w-robustness
@@ -155,7 +145,7 @@ public class VertexPulse {
 	 */
 	private boolean check_w_rob(int[] pWeights, int node) {
 		for (int i = 0; i < DataHandler.scenarios; i++) {
-			if(pWeights[i] + PulseGraph.vertexes[node].spMatrix[i][i] > DataHandler.w ){
+			if(pWeights[i] + PulseGraph.vertexes[node].spVector[i] > DataHandler.w ){
 				return true;
 			}
 		}
@@ -185,7 +175,7 @@ public class VertexPulse {
 		int b_dualBound = 0;
 
 		for (int i = 0; i < DataHandler.scenarios; i++) {
-			if (pWeights[i] + PulseGraph.vertexes[node].spMatrix[i][i] <= DataHandler.b) {
+			if (pWeights[i] + PulseGraph.vertexes[node].spVector[i] <= DataHandler.b) {
 				b_dualBound++;
 			}
 		}
@@ -362,11 +352,11 @@ public class VertexPulse {
 
 	
 	public int getCompareCriteria() {
-		int suma = 0;
+		int sum = 0;
 		for (int j = 0; j <  DataHandler.arc_weights; j++) {
-			suma += this.spMatrix[j][j];
+			sum += this.spVector[j];
 		}
-		return suma;
+		return sum;
 	}
 
 	

@@ -1,4 +1,4 @@
-package RobCSP;
+package bwRobSP;
 
 
 
@@ -43,7 +43,7 @@ public class DIKBD {
 		lowLevelBuckets = new Bucket[Delta];
 		highLevelBuckets = new AproxBucket[numHigh];
 		
-		G.getVertexByID(source).spMatrix[obj][obj] = 0;
+		G.getVertexByID(source).spVector[obj] = 0;
 		Snum = 0;
 		numNodes = G.getNumNodes();
 		indexL = 0;
@@ -68,16 +68,14 @@ public class DIKBD {
 	public void runAlgorithm() {
 		int numN = numNodes;
 		VertexPulse vi;
-		int[] di = new int[nObjs];
+		int di = 0;
  	
 		int lowIterator = 0;
 		boolean empty;
 		while (Snum < numN) {
 			while (lowIterator < Delta) {
 				vi = lowLevelBuckets[lowIterator].getEntrance();
-				for (int i = 0; i < di.length; i++) {
-					di[i] = vi.spMatrix[obj][i];
-				}
+				di = vi.spVector[obj];
 				empty = deleteToLabel(lowIterator);
 				Snum++;
 
@@ -87,12 +85,10 @@ public class DIKBD {
 				while (e != null) {
 					
 					vj = e.getTarget();
-					dj = vj.spMatrix[obj][obj];
-					if (dj > di[obj] + e.getWeight(obj )) {
-						int ndj = di[obj] + e.getWeight(obj);
-						for (int k = 0; k < nObjs; k++) {
-							vj.spMatrix[obj][k] = (di[k] + e.getWeight(k));
-						}
+					dj = vj.spVector[obj];
+					if (dj > di + e.getWeight(obj )) {
+						int ndj = di + e.getWeight(obj);
+						vj.spVector[obj] = ndj;
 						if (ndj < dK) {
 							if (vj.inserted[obj]) {
 								moveToLow(dj, ndj, vj);
@@ -147,7 +143,7 @@ public class DIKBD {
 			int dv;
 			while(entrance!=null){
 				baseAproxBucket.deleteToPass( entrance);
-				dv= entrance.spMatrix[obj][obj];
+				dv = entrance.spVector[obj];
 				lowLevelBuckets[dv-dL].insertVertex(entrance);
 				entrance = baseAproxBucket.getEntrance();
 			}

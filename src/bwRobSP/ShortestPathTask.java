@@ -1,4 +1,4 @@
-package RobCSP;
+package bwRobSP;
 
 public class ShortestPathTask implements Runnable {
 

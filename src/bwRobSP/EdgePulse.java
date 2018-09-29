@@ -1,5 +1,5 @@
 
-package RobCSP;
+package bwRobSP;
 
 public class EdgePulse {
 	
@@ -71,7 +71,7 @@ public class EdgePulse {
 	public int getCompareCriteria(){
 		int suma = 0;
 		for (int i = 0; i < DataHandler.arc_weights; i++) {
-			suma += target.spMatrix[i][i];
+			suma += target.spVector[i];
 		}
 		return suma;
 	}
