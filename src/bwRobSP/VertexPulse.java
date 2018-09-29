@@ -230,7 +230,7 @@ public class VertexPulse {
 			if (labels.size() < DataHandler.numLabels) {
 				insertLabel1(objs);
 			} else {
-				int luck = 1 + DataHandler.r.nextInt(DataHandler.numLabels - 2);
+				int luck = DataHandler.r.nextInt(DataHandler.numLabels );
 				labels.remove(luck);
 				insertLabel1(objs);
 			}

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 
 
-public class Main_RobustCSP {
+public class Main_bwRobustSP {
 	static Path p = Paths.get(System.getProperty("user.dir"));
 	
 
@@ -114,5 +114,9 @@ public class Main_RobustCSP {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static void read_setup(){
+		
 	}
 }
