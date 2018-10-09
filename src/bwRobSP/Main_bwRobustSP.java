@@ -27,7 +27,8 @@ public class Main_bwRobustSP {
 				f.delete();
 			}
 			f.createNewFile();
-			ArrayList<SetupInfo> experiments = read_setup();
+			int start_instance = Integer.parseInt(args[0]);
+			ArrayList<SetupInfo> experiments = read_setup(start_instance);
 			
 			for (SetupInfo exp : experiments) {
 				String ini = p.toString() + "/ini/" + exp.net_num + "_" + exp.scenarios + ".ini";
@@ -73,24 +74,24 @@ public class Main_bwRobustSP {
 				}
 
 				for (int i = 0; i < spAlgo.length; i++) {
-					if (DataHandler.weight_bound_availability[i] == 1)
+					if (DataHandler.weight_bound_availability[i] == 1){
 						tSp[i].join();
+					}
 				}
 				double spTime = (System.currentTimeMillis() - Atime) / 1000.0;
-				for (double num_labels = 0.5; num_labels <= 4; num_labels += 0.5) {
+				for (double num_labels = 0.5; num_labels <= 1.5; num_labels += 0.5) {
 					for (int reps = 0; reps < 10; reps++) {
 						String  exp_out_info = exp.net_num + "/" + instance.numScenarios + "/" + spTime;
-						System.out.print(exp.net_num + "/" + instance.numScenarios + "/" + spTime);
 						DataHandler.numLabels = (int) (num_labels * DataHandler.scenarios);
 						DataHandler.w = exp.w;
 						DataHandler.b = exp.b;
-						System.out.print("/" + num_labels + "/" + reps  + "/" + exp.w + "/" + exp.b );
+						
 						exp_out_info += "/" + num_labels + "/" + reps  + "/" + exp.w + "/" + exp.b;
 						// W:94214 0.5 65642
 						ArrayList<Integer> Path = new ArrayList<Integer>();
 						ArrayList<Integer> path_arcs = new ArrayList<Integer>();
 						double medicion = System.nanoTime();//currentTimeMillis();
-						int[] weights = new int[instance.numScenarios + instance.numCtrs];
+						int[] weights = new int[instance.numScenarios];
 						network.getVertexByID(instance.source - 1).pulse(0, weights, Path, path_arcs);
 						medicion = (System.nanoTime() - medicion) /1000000000.0;
 						String pulse_time = String.format("%6f" , medicion);
@@ -115,7 +116,7 @@ public class Main_bwRobustSP {
 				data.weights = null;
 				data = null;
 				network = null;
-				System.gc();
+				//System.gc();
 
 			}
 
@@ -129,7 +130,7 @@ public class Main_bwRobustSP {
 	 * Reads a csv file with the experiment setup: Network name Network id
 	 * Values for w and b Objective function for validation
 	 */
-	public static ArrayList<SetupInfo> read_setup() {
+	public static ArrayList<SetupInfo> read_setup(int start_num) {
 		ArrayList<SetupInfo> experiments = new ArrayList<SetupInfo>();
 
 		File file = new File(p.toString() + "/data/RN_setup/bwRobSP_setup.csv");
@@ -153,8 +154,10 @@ public class Main_bwRobustSP {
 				SetupInfo instance = new SetupInfo();
 				instance.net = read[1];
 				instance.net_num = read[2];
+				
+				int num = Integer.parseInt(instance.net_num.substring(2));
 				instance.scenarios = Integer.parseInt(read[3]);
-				if (instance.net.equals("RI") && instance.scenarios > 1) {
+				if (instance.net.equals("RI") && instance.scenarios > 1  && num>=start_num) {
 					instance.w = Integer.parseInt(read[4]);
 					instance.b = Integer.parseInt(read[5]);
 					instance.of = Integer.parseInt(read[8]);
