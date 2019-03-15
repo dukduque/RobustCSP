@@ -157,7 +157,7 @@ public class Main_bwRobustSP {
 				
 				int num = Integer.parseInt(instance.net_num.substring(2));
 				instance.scenarios = Integer.parseInt(read[3]);
-				if (instance.net.equals("RI") && instance.scenarios > 1  && num>=start_num) {
+				if (instance.net.equals("RI") && instance.scenarios == 1000  && num==start_num) {
 					instance.w = Integer.parseInt(read[4]);
 					instance.b = Integer.parseInt(read[5]);
 					instance.of = Integer.parseInt(read[8]);
